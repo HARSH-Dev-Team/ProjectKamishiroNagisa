@@ -1,1 +1,0 @@
-Wiki files location.
