@@ -19,7 +19,7 @@ unique_data = []
 duplicates = []
 
 for i, sample in enumerate(data):
-    key = (sample["input"], sample["output"])
+    key = (sample.get("input"), sample.get("output"))
     if key in seen:
         duplicates.append((i, sample))
     else:
@@ -30,16 +30,15 @@ if duplicates:
     print(f"⚠️ 發現 {len(duplicates)} 筆重複樣本（已刪除重複，只保留第一筆）：")
     for idx, dup in duplicates:
         print(f"- 索引 {idx}: input={dup['input']}, output={dup['output']}")
+    # 只有在有重複時才詢問是否儲存
+    save_choice = input("是否要儲存無重複的新檔案？(y/yes 以儲存): ").strip().lower()
+    if save_choice in ("y", "yes"):
+        output_filename = f"{original_filename}_no_duplicates.json"
+        output_path = os.path.join(file_dir, output_filename)
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(unique_data, f, ensure_ascii=False, indent=2)
+        print(f"已儲存無重複樣本至 {output_path}")
+    else:
+        print("未儲存新檔案。")
 else:
-    print("✅ 沒有發現重複樣本")
-
-# 詢問使用者是否要儲存無重複的新 JSON 檔
-save_choice = input("是否要儲存無重複的新檔案？(y/yes 以儲存): ").strip().lower()
-if save_choice in ("y", "yes"):
-    output_filename = f"{original_filename}_no_duplicates.json"
-    output_path = os.path.join(file_dir, output_filename)
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(unique_data, f, ensure_ascii=False, indent=2)
-    print(f"已儲存無重複樣本至 {output_path}")
-else:
-    print("未儲存新檔案。")
+    print("✅ 沒有發現重複樣本，程式結束。")
